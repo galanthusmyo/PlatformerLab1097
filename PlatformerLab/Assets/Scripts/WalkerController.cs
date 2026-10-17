@@ -14,6 +14,7 @@ public class WalkerController : MonoBehaviour
 
     private InputAction jumpAction;
     private bool jumpRequested;
+    private bool jumpCutRequested;
     private bool isGrounded;
 
     private Rigidbody2D rb;
@@ -35,6 +36,7 @@ public class WalkerController : MonoBehaviour
     void Update()
     {
         moveInput = moveAction.ReadValue<Vector2>().x;
+
         if (moveInput != 0f)
         {
             spriteRenderer.flipX = moveInput > 0f;
@@ -43,6 +45,11 @@ public class WalkerController : MonoBehaviour
         if (jumpAction.WasPressedThisFrame())
         {
             jumpRequested = true;
+        }
+
+        if (jumpAction.WasReleasedThisFrame())
+        {
+            jumpCutRequested = true;
         }
     }
 
@@ -58,7 +65,13 @@ public class WalkerController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpVelocity);
         }
 
+        if (jumpCutRequested && rb.linearVelocity.y > 0f)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
+        }
+
         jumpRequested = false;
+        jumpCutRequested = false;
     }
 
     void OnDrawGizmosSelected()
